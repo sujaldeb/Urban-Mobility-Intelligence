@@ -1,0 +1,6 @@
+data/raw_csv/
+data/parquet/
+gcp_credentials.json
+__pycache__/
+*.pyc
+.env
