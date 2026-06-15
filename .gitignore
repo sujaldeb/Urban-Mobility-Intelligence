@@ -1,6 +1,10 @@
 data/raw_csv/
 data/parquet/
 gcp_credentials.json
+memory_bridge.md
+IMPROVEMENTS_SUMMARY.md
 __pycache__/
 *.pyc
 .env
+*.tmp
+logs/
