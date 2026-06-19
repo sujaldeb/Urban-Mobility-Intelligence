@@ -918,75 +918,33 @@ with tab4:
         if err:
             st.error(err)
         else:
-            forecast = result.get("forecast", [])
-            zone_out = result.get("zone_id", zone_id)
+            zone_out  = result.get("zone_id", zone_id)
+            hour      = result.get("hour_of_day", 0)
+            trips     = result.get("predicted_trips", 0)
+            model_name = result.get("model", "LightGBM 24h ahead")
+            note      = result.get("note", "")
 
-            if forecast:
-                hours  = [f["hour"] for f in forecast]
-                counts = [f["predicted_trips"] for f in forecast]
-
-                fig = go.Figure()
-                fig.add_trace(go.Scatter(
-                    x=hours,
-                    y=counts,
-                    mode="lines+markers",
-                    line=dict(color="#7c3aed", width=2.5),
-                    marker=dict(color="#7c3aed", size=5),
-                    fill="tozeroy",
-                    fillcolor="rgba(124,58,237,0.08)",
-                    name="Predicted trips",
-                ))
-                fig.update_layout(
-                    paper_bgcolor="rgba(0,0,0,0)",
-                    plot_bgcolor="rgba(0,0,0,0)",
-                    height=320,
-                    margin=dict(t=20, b=30, l=10, r=10),
-                    xaxis=dict(
-                        title="Hour of day",
-                        tickfont={"color": "#64748b"},
-                        gridcolor="rgba(255,255,255,0.04)",
-                        titlefont={"color": "#64748b", "size": 11},
-                    ),
-                    yaxis=dict(
-                        title="Predicted trips",
-                        tickfont={"color": "#64748b"},
-                        gridcolor="rgba(255,255,255,0.04)",
-                        zeroline=False,
-                        titlefont={"color": "#64748b", "size": 11},
-                    ),
-                    font={"color": "white", "family": "Inter"},
-                    showlegend=False,
-                    title=dict(
-                        text=f"Zone {zone_out} — 24h Demand Forecast",
-                        font={"color": "#e2e8f0", "size": 13},
-                        x=0.01,
-                    ),
-                )
-                with d_col2:
-                    st.plotly_chart(fig, use_container_width=True)
-
-                peak_hour  = hours[counts.index(max(counts))]
-                total_pred = sum(counts)
-                st.markdown(f"""
-                <div class="pred-box" style="margin-top:0;">
-                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
-                        <div>
-                            <div class="pred-label">Peak Hour</div>
-                            <div class="pred-value" style="font-size:1.5rem;">{peak_hour}:00</div>
-                        </div>
-                        <div>
-                            <div class="pred-label">Peak Demand</div>
-                            <div class="pred-value" style="font-size:1.5rem;">{max(counts):,}</div>
-                        </div>
-                        <div>
-                            <div class="pred-label">24h Total</div>
-                            <div class="pred-value" style="font-size:1.5rem;">{total_pred:,}</div>
-                        </div>
+            st.markdown(f"""
+            <div class="pred-box">
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.2rem;">
+                    <div>
+                        <div class="pred-label">Zone</div>
+                        <div class="pred-value" style="font-size:1.5rem;">{zone_out}</div>
+                    </div>
+                    <div>
+                        <div class="pred-label">Forecast Hour</div>
+                        <div class="pred-value" style="font-size:1.5rem;">{hour}:00</div>
+                    </div>
+                    <div>
+                        <div class="pred-label">Predicted Trips</div>
+                        <div class="pred-value" style="font-size:1.5rem;color:#7c3aed;">{int(trips):,}</div>
                     </div>
                 </div>
-                """, unsafe_allow_html=True)
-            else:
-                st.warning("No forecast data returned for this zone.")
+                <div style="font-size:0.76rem;color:#475569;margin-top:0.8rem;">
+                    Model: {model_name} · {note}
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
 
     # Footer
     st.markdown("""
