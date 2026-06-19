@@ -2,7 +2,6 @@ import streamlit as st
 import requests
 import plotly.graph_objects as go
 import plotly.express as px
-from PIL import Image
 import os
 
 # ── Page config ───────────────────────────────────────────────────────────────
@@ -335,18 +334,21 @@ label { font-size: 0.82rem !important; color: #94a3b8 !important; }
 """, unsafe_allow_html=True)
 
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
-def load_plot(filename):
-    path = os.path.join(PLOTS_DIR, filename)
-    if os.path.exists(path):
-        return Image.open(path)
-    return None
 
+
+
+import base64
 
 def show_plot(filename, caption=None):
-    img = load_plot(filename)
-    if img:
-        st.image(img, caption=caption, use_container_width=True)
+    path = os.path.join(PLOTS_DIR, filename)
+    if os.path.exists(path):
+        with open(path, "rb") as f:
+            data = base64.b64encode(f.read()).decode()
+        ext = filename.split(".")[-1]
+        mime = "image/png" if ext == "png" else "image/jpeg"
+        st.markdown(f'<img src="data:{mime};base64,{data}" style="width:100%;border-radius:8px;">', unsafe_allow_html=True)
+        if caption:
+            st.markdown(f'<div style="font-size:0.72rem;color:#475569;margin-top:0.3rem;">{caption}</div>', unsafe_allow_html=True)
     else:
         st.markdown(f"""
         <div style="background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.1);
